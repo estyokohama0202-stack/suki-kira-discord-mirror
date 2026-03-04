@@ -1,0 +1,22 @@
+import requests
+from bs4 import BeautifulSoup
+import time
+
+URL = "https://suki-kira.com/people/result/DJ%20SHIGE"
+
+while True:
+
+    r = requests.get(URL)
+
+    soup = BeautifulSoup(r.text,"html.parser")
+
+    comments = soup.select(".comment-body")
+
+    print("コメント取得")
+
+    for c in comments[:5]:
+        print(c.text.strip())
+
+    print("------")
+
+    time.sleep(60)
