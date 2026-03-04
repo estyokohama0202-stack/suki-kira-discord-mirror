@@ -1,22 +1,85 @@
 import requests
 from bs4 import BeautifulSoup
 import time
+import json
+import os
 
 URL = "https://suki-kira.com/people/result/DJ%20SHIGE"
 
+DISCORD_WEBHOOK = "ここにDiscordWebhookURL"
+
+SAVE_FILE = "last_comment.txt"
+
+
+def get_last_comment():
+    if not os.path.exists(SAVE_FILE):
+        return None
+    with open(SAVE_FILE, "r", encoding="utf-8") as f:
+        return f.read()
+
+
+def save_last_comment(text):
+    with open(SAVE_FILE, "w", encoding="utf-8") as f:
+        f.write(text)
+
+
+def send_discord(comment):
+
+    payload = {
+        "embeds": [
+            {
+                "title": "好き嫌い.com 新コメント",
+                "description": comment[:2000],
+                "url": URL,
+                "color": 16711680
+            }
+        ]
+    }
+
+    requests.post(DISCORD_WEBHOOK, json=payload)
+
+
+def get_comments():
+
+    r = requests.get(URL, headers={
+        "User-Agent": "Mozilla/5.0"
+    })
+
+    soup = BeautifulSoup(r.text, "html.parser")
+
+    comments = []
+
+    for c in soup.select(".comment-body"):
+        text = c.get_text(strip=True)
+        comments.append(text)
+
+    return comments
+
+
+print("BOT START")
+
 while True:
 
-    r = requests.get(URL)
+    try:
 
-    soup = BeautifulSoup(r.text,"html.parser")
+        comments = get_comments()
 
-    comments = soup.select(".comment-body")
+        last_saved = get_last_comment()
 
-    print("コメント取得")
+        newest = comments[0] if comments else None
 
-    for c in comments[:5]:
-        print(c.text.strip())
+        if newest and newest != last_saved:
 
-    print("------")
+            print("新コメント検知")
+
+            send_discord(newest)
+
+            save_last_comment(newest)
+
+        else:
+            print("更新なし")
+
+    except Exception as e:
+        print("error:", e)
 
     time.sleep(60)
