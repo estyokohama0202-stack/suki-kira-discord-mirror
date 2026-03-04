@@ -6,7 +6,7 @@ import os
 
 URL = "https://suki-kira.com/people/result/DJ%20SHIGE"
 
-DISCORD_WEBHOOK = "ここにDiscordWebhookURL"
+DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1478814308900278292/wgBbsBOuldG0ZdrbKYv9o9quySJlGGlJtmSFzbYW5CpHncf4o7yhWGEQTNqlkQCBkJK9"
 
 SAVE_FILE = "last_comment.txt"
 
